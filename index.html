@@ -21,14 +21,15 @@
     background:#16171a; transition:background .25s; }
   .half.on.home { background:var(--home); }
   .half.on.away { background:var(--away); }
-  .team { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3vh;
+  .team { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center;
     opacity:.28; transition:opacity .25s, transform .25s; padding:0 3vw; text-align:center; }
   .half.on .team { opacity:1; transform:scale(1.03); }
-  .logo { height:clamp(80px,30vh,320px); width:auto; max-width:34vw; object-fit:contain; display:none; }
+  .logo { position:absolute; bottom:calc(100% + 4vh); left:50%; transform:translateX(-50%); height:clamp(80px,26vh,300px); width:auto; max-width:34vw; object-fit:contain; display:none; }
   .logo.has { display:block; }
   .name { font-size:clamp(30px,7.5vh,84px); font-weight:800; letter-spacing:.03em; line-height:1.15; word-break:keep-all; }
   .badge { font-size:clamp(16px,3.4vh,34px); font-weight:800; letter-spacing:.3em; padding:.35em 1.1em .35em 1.4em;
-    border-radius:999px; background:#fff; color:#111214; visibility:hidden; }
+    border-radius:999px; background:#fff; color:#111214; visibility:hidden;
+    position:absolute; top:calc(100% + 3vh); left:50%; transform:translateX(-50%); white-space:nowrap; }
   .half.on .badge { visibility:visible; }
   .half.on.home .badge { color:var(--home); }
   .half.on.away .badge { color:var(--away); }
