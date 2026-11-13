@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAADp0lEQVR4Xu3czWoUURSF0VYEwZkhvqg+h76o4FBw5qAhSGyldtX9ObdqrTeI2Xx10pX45uPT8w0eeeufhX8xDoyDnHKgHOSUA+UgpxwoBznlQDnIKQfKQU45UA5yyoFykFMOlIOccqAc5JQD5SCnHCgHOeVAOcgpB8pBTjlQDnLKgXKQUw6Ug5xyoBzklAPlIKccKAc55UA5yCkHykFOOVAOcsqBcpBTDpSDnHKgHOSUg8XL8evz9zN9D398/bnEl7NAOU62jLsl9lF9HKdcxir7eFe2byeexYt7P56+fKj5XShajiss49VECqo4jksto/Ijptw4LriMsvsodHNcdhZlT5Aq5bCMgidIiXFYxitFPgWZPw7LeKjCPmbeHGbxf9M/BZlWDsvYaGJC5ozDMiKz9jFhHJaxw5R9jB6HZew2fh/jDlKzOG7wiTqoHJbR0LCEjBiHZTQ3Zh/dx2EZnQzYR8ebwyx6632C9CqHZQzTLyFvPj49N/8yllvG+2+far762q7H7xq2L8dyyziHHv1oPA7LmKj5PpodpGZRQdsTtU05LKOUVglpMA7LKKjJPo6OwzLKOr6P/TeHWdR38ATZWQ7LWMjuhOwZh2UsZ98+4nFYxqJ27CO4OcxidekJsrUclnEa2xOyaRyWcTIb97FpHH+/tGRpG1/hbr057vuQkNVtnMXdpnK8kJClRcuIx3G72ceq0mXsGYd9rGjHMm63zTfHK06QVeybxZ6b4+FEKOvIMnY+Vv7kRC3r4DIajMMJUtPxZey/OZwgZTWZRYObwwlSTcNltHmsOEGKaLuM222dv3g70+W78b1XpPkymt0cTpCJesyi/c3hBBmv3zLa3xz2MVLXZfR6rPx9onrX31bvWXR/rPgpppMxy+j+WLGP5oYtY+g4fNB+3MhljLg5Hp6oTpDU4FkMvTn8FHPElGWMfqw4QXaYtYyZ43CCbDFxGRNuDifIRnNnMfPmcIL8X4VlTH6sOEEeKrKMQuNwgtzVWcb8m8MJ8qLULArdHE6Qgsuo9Vi57AlScxl1x3GdE6TsMsrdHJc6QSrPou7NcYUTpP4yev32OeeQ/ectXIpx8E/GgXGQUw6Ug5xyoBzklAPlIKccKAc55UA5yCkHykFOOVAOcsqBcpBTDpSDnHKgHOSUA+UgpxwoBznlQDnIKQfKQU45UA5yyoFykFMOlIOccqAc5JQD5SCnHCgHOeVAOcgpB8pBTjlQDnLKgXKQUw6Ug9xvK8P3b7N44H4AAAAASUVORK5CYII=">
 <style>
-  :root { --bg:#111214; --fg:#f5f5f7; --dim:#3a3b3f; --home:#0a84ff; --away:#ff9f0a; }
+  :root { --bg:#111214; --fg:#f5f5f7; --dim:#3a3b3f; --home:#0a84ff; --away:#ff9f0a; --homeInk:#fff; --awayInk:#fff; }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; -webkit-user-select:none; user-select:none; }
   html, body { margin:0; height:100%; background:var(--bg); color:var(--fg); overflow:hidden;
     font-family:-apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif; touch-action:manipulation; }
@@ -24,6 +24,8 @@
   .team { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center;
     opacity:.28; transition:opacity .25s, transform .25s; padding:0 3vw; text-align:center; }
   .half.on .team { opacity:1; transform:scale(1.03); }
+  .half.on.home .team { color:var(--homeInk); }
+  .half.on.away .team { color:var(--awayInk); }
   .logo { position:absolute; bottom:calc(100% + 4vh); left:50%; transform:translateX(-50%); height:clamp(80px,26vh,300px); width:auto; max-width:34vw; object-fit:contain; display:none; }
   .logo.has { display:block; }
   .name { font-size:clamp(30px,7.5vh,84px); font-weight:800; letter-spacing:.03em; line-height:1.15; word-break:keep-all; }
@@ -31,8 +33,8 @@
     border-radius:999px; background:#fff; color:#111214; visibility:hidden;
     position:absolute; top:calc(100% + 3vh); left:50%; transform:translateX(-50%); white-space:nowrap; }
   .half.on .badge { visibility:visible; }
-  .half.on.home .badge { color:var(--home); }
-  .half.on.away .badge { color:var(--away); }
+  .half.on.home .badge { background:var(--homeInk); color:var(--home); }
+  .half.on.away .badge { background:var(--awayInk); color:var(--away); }
   #mid { position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); width:clamp(70px,12vw,150px); height:clamp(70px,12vw,150px);
     border-radius:50%; background:#111214; border:4px solid #fff; display:flex; align-items:center; justify-content:center;
     pointer-events:none; z-index:3; transition:opacity .2s; opacity:0; }
@@ -54,6 +56,11 @@
   .card input[type=text] { width:100%; font-size:17px; padding:10px 12px; border-radius:8px; border:1px solid #3a3b3f; background:#111214; color:#f5f5f7; -webkit-user-select:text; user-select:text; }
   .logorow { display:flex; align-items:center; gap:10px; margin-top:10px; }
   .thumb { width:52px; height:52px; border-radius:8px; border:1px solid #3a3b3f; background:#111214; object-fit:contain; }
+  .sw { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; align-items:center; }
+  .sw button { width:34px; height:34px; border-radius:50%; border:1px solid #3a3b3f; padding:0; }
+  .sw button.sel { outline:3px solid #fff; outline-offset:2px; }
+  .sw label { position:relative; width:34px; height:34px; border-radius:50%; border:1px dashed #8e8e93; display:flex; align-items:center; justify-content:center; color:#8e8e93; font-size:18px; overflow:hidden; }
+  .sw label input { position:absolute; inset:0; opacity:0; width:100%; height:100%; }
   .btn { font-size:15px; padding:10px 14px; border-radius:10px; border:1px solid #3a3b3f; background:#2a2b2f; color:#f5f5f7; }
   .file { position:relative; overflow:hidden; }
   .file input { position:absolute; inset:0; opacity:0; }
@@ -85,6 +92,7 @@
         <label class="btn file">ロゴを選ぶ<input type="file" accept="image/*" id="fileH"></label>
         <button class="btn" id="delH">削除</button>
       </div>
+      <div class="sw" id="swH"></div>
     </div>
     <div class="sec">
       <div class="lbl">アウェイ（相手チーム）</div>
@@ -94,6 +102,7 @@
         <label class="btn file">ロゴを選ぶ<input type="file" accept="image/*" id="fileA"></label>
         <button class="btn" id="delA">削除</button>
       </div>
+      <div class="sw" id="swA"></div>
     </div>
     <button id="swap" class="swap">⇄ コートチェンジ（後半）</button>
     <div class="row">
@@ -123,8 +132,24 @@
     get poss(){ return store.get('poss', ''); },
     get awayName(){ return store.get('awayName', 'アウェイ'); }
   };
+  const PAL = ['#0a84ff','#1b3a8c','#00a0e9','#e60012','#ff9f0a','#ffd60a','#2fa84f','#7d3cb5','#ff2d78','#8a8f98','#111111','#ffffff'];
+  function ink(hex){ const n = parseInt(hex.slice(1), 16), r = n >> 16 & 255, g = n >> 8 & 255, b = n & 255; return (0.299*r + 0.587*g + 0.114*b) > 165 ? '#111214' : '#ffffff'; }
+  function buildSw(k, cur){
+    const box = $('sw' + k); box.innerHTML = '';
+    PAL.forEach(c => { const b = document.createElement('button'); b.style.background = c; if (c === cur) b.className = 'sel';
+      b.addEventListener('click', () => { store.set('color' + k, c); render(); }); box.appendChild(b); });
+    const l = document.createElement('label'); l.textContent = '＋'; if (!PAL.includes(cur)) { l.style.background = cur; l.style.borderStyle = 'solid'; l.style.outline = '3px solid #fff'; l.style.outlineOffset = '2px'; }
+    const i = document.createElement('input'); i.type = 'color'; i.value = cur;
+    i.addEventListener('change', () => { store.set('color' + k, i.value); render(); }); l.appendChild(i); box.appendChild(l);
+  }
+  function applyColors(){
+    const h = store.get('colorH', '#0a84ff'), a = store.get('colorA', '#ff9f0a'), st = document.documentElement.style;
+    st.setProperty('--home', h); st.setProperty('--away', a); st.setProperty('--homeInk', ink(h)); st.setProperty('--awayInk', ink(a));
+    buildSw('H', h); buildSw('A', a);
+  }
   function teamOn(side){ return side === S.homeSide ? 'H' : 'A'; }
   function render(){
+    applyColors();
     for (const side of ['L', 'R']) {
       const t = teamOn(side), el = $(side);
       el.classList.toggle('home', t === 'H');
