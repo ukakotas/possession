@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ポゼッション">
+<title>ポゼッション矢印</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAADp0lEQVR4Xu3czWoUURSF0VYEwZkhvqg+h76o4FBw5qAhSGyldtX9ObdqrTeI2Xx10pX45uPT8w0eeeufhX8xDoyDnHKgHOSUA+UgpxwoBznlQDnIKQfKQU45UA5yyoFykFMOlIOccqAc5JQD5SCnHCgHOeVAOcgpB8pBTjlQDnLKgXKQUw6Ug5xyoBzklAPlIKccKAc55UA5yCkHykFOOVAOcsqBcpBTDpSDnHKgHOSUg8XL8evz9zN9D398/bnEl7NAOU62jLsl9lF9HKdcxir7eFe2byeexYt7P56+fKj5XShajiss49VECqo4jksto/Ijptw4LriMsvsodHNcdhZlT5Aq5bCMgidIiXFYxitFPgWZPw7LeKjCPmbeHGbxf9M/BZlWDsvYaGJC5ozDMiKz9jFhHJaxw5R9jB6HZew2fh/jDlKzOG7wiTqoHJbR0LCEjBiHZTQ3Zh/dx2EZnQzYR8ebwyx6632C9CqHZQzTLyFvPj49N/8yllvG+2+far762q7H7xq2L8dyyziHHv1oPA7LmKj5PpodpGZRQdsTtU05LKOUVglpMA7LKKjJPo6OwzLKOr6P/TeHWdR38ATZWQ7LWMjuhOwZh2UsZ98+4nFYxqJ27CO4OcxidekJsrUclnEa2xOyaRyWcTIb97FpHH+/tGRpG1/hbr057vuQkNVtnMXdpnK8kJClRcuIx3G72ceq0mXsGYd9rGjHMm63zTfHK06QVeybxZ6b4+FEKOvIMnY+Vv7kRC3r4DIajMMJUtPxZey/OZwgZTWZRYObwwlSTcNltHmsOEGKaLuM222dv3g70+W78b1XpPkymt0cTpCJesyi/c3hBBmv3zLa3xz2MVLXZfR6rPx9onrX31bvWXR/rPgpppMxy+j+WLGP5oYtY+g4fNB+3MhljLg5Hp6oTpDU4FkMvTn8FHPElGWMfqw4QXaYtYyZ43CCbDFxGRNuDifIRnNnMfPmcIL8X4VlTH6sOEEeKrKMQuNwgtzVWcb8m8MJ8qLULArdHE6Qgsuo9Vi57AlScxl1x3GdE6TsMsrdHJc6QSrPou7NcYUTpP4yev32OeeQ/ectXIpx8E/GgXGQUw6Ug5xyoBzklAPlIKccKAc55UA5yCkHykFOOVAOcsqBcpBTDpSDnHKgHOSUA+UgpxwoBznlQDnIKQfKQU45UA5yyoFykFMOlIOccqAc5JQD5SCnHCgHOeVAOcgpB8pBTjlQDnLKgXKQUw6Ug9xvK8P3b7N44H4AAAAASUVORK5CYII=">
+<style>
+  :root { --bg:#111214; --fg:#f5f5f7; --dim:#3a3b3f; --left:#0a84ff; --right:#ff9f0a; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; -webkit-user-select:none; user-select:none; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--fg); overflow:hidden;
+    font-family:-apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif; touch-action:manipulation; }
+  #stage { position:fixed; inset:0; display:flex;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+  .half { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3vh; cursor:pointer; transition:background .2s; }
+  .half.on.l { background:rgba(10,132,255,.14); }
+  .half.on.r { background:rgba(255,159,10,.14); }
+  .arrow { width:min(40vw,62vh); height:auto; transition:opacity .2s, transform .2s; opacity:.12; }
+  .arrow path { fill:var(--dim); transition:fill .2s; }
+  .half.on .arrow { opacity:1; transform:scale(1.04); }
+  .half.on.l .arrow path { fill:var(--left); }
+  .half.on.r .arrow path { fill:var(--right); }
+  .name { font-size:clamp(28px,6vh,64px); font-weight:700; letter-spacing:.04em; opacity:.35; transition:opacity .2s; }
+  .half.on .name { opacity:1; }
+  .divider { width:1px; background:#2a2b2f; margin:8vh 0; }
+  #gear { position:fixed; right:calc(16px + env(safe-area-inset-right)); bottom:calc(16px + env(safe-area-inset-bottom));
+    width:44px; height:44px; border-radius:22px; border:1px solid #2f3034; background:#1c1d20; color:#8e8e93;
+    font-size:20px; display:flex; align-items:center; justify-content:center; z-index:5; }
+  #sheet { position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; z-index:10; }
+  #sheet.open { display:flex; }
+  .card { background:#1c1d20; border:1px solid #2f3034; border-radius:14px; padding:24px; width:min(420px,88vw); }
+  .card h2 { margin:0 0 16px; font-size:17px; font-weight:600; }
+  .card label { display:block; font-size:13px; color:#8e8e93; margin:12px 0 6px; }
+  .card input { width:100%; font-size:17px; padding:10px 12px; border-radius:8px; border:1px solid #3a3b3f; background:#111214; color:#f5f5f7; -webkit-user-select:text; user-select:text; }
+  .row { display:flex; gap:10px; margin-top:20px; }
+  .row button { flex:1; font-size:16px; padding:12px; border-radius:10px; border:1px solid #3a3b3f; background:#2a2b2f; color:#f5f5f7; }
+  .row button.primary { background:#0a84ff; border-color:#0a84ff; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="half l" id="L">
+    <svg class="arrow" viewBox="0 0 200 140"><path d="M0 70 L80 0 V40 H200 V100 H80 V140 Z"/></svg>
+    <div class="name" id="nameL">ホーム</div>
+  </div>
+  <div class="divider"></div>
+  <div class="half r" id="R">
+    <svg class="arrow" viewBox="0 0 200 140"><path d="M200 70 L120 0 V40 H0 V100 H120 V140 Z"/></svg>
+    <div class="name" id="nameR">アウェイ</div>
+  </div>
+</div>
+<button id="gear" aria-label="設定">⚙︎</button>
+<div id="sheet">
+  <div class="card">
+    <h2>チーム名</h2>
+    <label for="inL">左側</label><input id="inL" maxlength="12">
+    <label for="inR">右側</label><input id="inR" maxlength="12">
+    <div class="row">
+      <button id="clear">矢印を消す</button>
+      <button id="ok" class="primary">OK</button>
+    </div>
+  </div>
+</div>
+<script>
+  const $ = id => document.getElementById(id);
+  const store = {
+    get(k, d){ try { return localStorage.getItem(k) ?? d; } catch(e){ return d; } },
+    set(k, v){ try { localStorage.setItem(k, v); } catch(e){} }
+  };
+  let side = store.get('side', '');
+  function render(){
+    $('L').classList.toggle('on', side === 'L');
+    $('R').classList.toggle('on', side === 'R');
+    $('nameL').textContent = store.get('nameL', 'ホーム');
+    $('nameR').textContent = store.get('nameR', 'アウェイ');
+  }
+  let lock = null;
+  async function keepAwake(){
+    try { if ('wakeLock' in navigator && !lock) { lock = await navigator.wakeLock.request('screen'); lock.addEventListener('release', () => lock = null); } } catch(e){}
+  }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') keepAwake(); });
+  function pick(s){ side = s; store.set('side', s); render(); keepAwake(); }
+  $('L').addEventListener('click', () => pick('L'));
+  $('R').addEventListener('click', () => pick('R'));
+  $('gear').addEventListener('click', () => {
+    $('inL').value = store.get('nameL', 'ホーム');
+    $('inR').value = store.get('nameR', 'アウェイ');
+    $('sheet').classList.add('open');
+  });
+  $('ok').addEventListener('click', () => {
+    store.set('nameL', $('inL').value.trim() || 'ホーム');
+    store.set('nameR', $('inR').value.trim() || 'アウェイ');
+    $('sheet').classList.remove('open'); render();
+  });
+  $('clear').addEventListener('click', () => { pick(''); $('sheet').classList.remove('open'); });
+  $('sheet').addEventListener('click', e => { if (e.target.id === 'sheet') $('sheet').classList.remove('open'); });
+  document.addEventListener('gesturestart', e => e.preventDefault());
+  render();
+  if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').catch(() => {}); }
+</script>
+</body>
+</html>
