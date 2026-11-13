@@ -1,0 +1,10 @@
+{
+ "name": "ポゼッション矢印",
+ "short_name": "ポゼッション",
+ "start_url": "./index.html",
+ "scope": "./",
+ "display": "fullscreen",
+ "orientation": "landscape",
+ "background_color": "#111214",
+ "theme_color": "#111214"
+}
