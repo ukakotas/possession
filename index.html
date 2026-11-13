@@ -54,6 +54,7 @@
   .lbl { font-size:13px; color:#8e8e93; margin:0 0 8px; }
   .fixed { font-size:17px; font-weight:600; }
   .card input[type=text] { width:100%; font-size:17px; padding:10px 12px; border-radius:8px; border:1px solid #3a3b3f; background:#111214; color:#f5f5f7; -webkit-user-select:text; user-select:text; }
+  .sel { width:100%; font-size:17px; padding:10px 12px; margin-bottom:8px; border-radius:8px; border:1px solid #3a3b3f; background:#111214; color:#f5f5f7; }
   .logorow { display:flex; align-items:center; gap:10px; margin-top:10px; }
   .thumb { width:52px; height:52px; border-radius:8px; border:1px solid #3a3b3f; background:#111214; object-fit:contain; }
   .sw { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; align-items:center; }
@@ -96,7 +97,8 @@
     </div>
     <div class="sec">
       <div class="lbl">アウェイ（相手チーム）</div>
-      <input type="text" id="inA" maxlength="14" placeholder="チーム名">
+      <select id="selA" class="sel"><option value="">Bプレミアのチームから選ぶ…</option></select>
+      <input type="text" id="inA" maxlength="14" placeholder="チーム名（手入力も可）">
       <div class="logorow">
         <img class="thumb" id="thumbA" alt="">
         <label class="btn file">ロゴを選ぶ<input type="file" accept="image/*" id="fileA"></label>
@@ -132,7 +134,15 @@
     get poss(){ return store.get('poss', ''); },
     get awayName(){ return store.get('awayName', 'アウェイ'); }
   };
-  const PAL = ['#0a84ff','#1b3a8c','#00a0e9','#e60012','#ff9f0a','#ffd60a','#2fa84f','#7d3cb5','#ff2d78','#8a8f98','#111111','#ffffff'];
+  const PAL = ['#0067c0','#1a4472','#36a7cc','#e60012','#eb6101','#fabe00','#e3a857','#00913a','#6a3fa0','#ec008c','#1c2340','#ffffff'];
+  // Bプレミア 2026-27 参加26クラブ（色は各クラブのチームカラーの近似値）
+  const TEAMS = [
+    ['東地区', [['レバンガ北海道','#b9c42f'],['仙台89ERS','#fabe00'],['秋田ノーザンハピネッツ','#ec008c'],['茨城ロボッツ','#3b4c8e'],['宇都宮ブレックス','#1a4472'],['群馬クレインサンダーズ','#ffd400'],['アルティーリ千葉','#1c2340'],['千葉ジェッツ','#ed1c24'],['アルバルク東京','#e6002f'],['東京サンロッカーズ','#6a3fa0'],['川崎ブレイブサンダース','#c22047'],['横浜ビー・コルセアーズ','#0f2350'],['富山グラウジーズ','#e60033']]],
+    ['西地区', [['信州ブレイブウォリアーズ','#3d496b'],['三遠ネオフェニックス','#e60012'],['シーホース三河','#0054a6'],['名古屋ダイヤモンドドルフィンズ','#e60033'],['滋賀レイクス','#0075c2'],['京都ハンナリーズ','#2a83a2'],['大阪エヴェッサ','#ed1c24'],['神戸ストークス','#00913a'],['広島ドラゴンフライズ','#eb6101'],['佐賀バルーナーズ','#36a7cc'],['長崎ヴェルカ','#1f2e55'],['琉球ゴールデンキングス','#e3a857']]]
+  ];
+  const SHORT = {'レバンガ北海道':'北海道','仙台89ERS':'仙台','秋田ノーザンハピネッツ':'秋田','茨城ロボッツ':'茨城','宇都宮ブレックス':'宇都宮','群馬クレインサンダーズ':'群馬','アルティーリ千葉':'A千葉','千葉ジェッツ':'千葉J','アルバルク東京':'A東京','東京サンロッカーズ':'東京SR','川崎ブレイブサンダース':'川崎','横浜ビー・コルセアーズ':'横浜BC','富山グラウジーズ':'富山','信州ブレイブウォリアーズ':'信州','三遠ネオフェニックス':'三遠','シーホース三河':'三河','名古屋ダイヤモンドドルフィンズ':'名古屋D','滋賀レイクス':'滋賀','京都ハンナリーズ':'京都','大阪エヴェッサ':'大阪','神戸ストークス':'神戸','広島ドラゴンフライズ':'広島','佐賀バルーナーズ':'佐賀','長崎ヴェルカ':'長崎','琉球ゴールデンキングス':'琉球'};
+  (function(){ const s = $('selA'); TEAMS.forEach(([g, list]) => { const og = document.createElement('optgroup'); og.label = g; list.forEach(([n, c]) => { const o = document.createElement('option'); o.value = n; o.dataset.c = c; o.textContent = n; og.appendChild(o); }); s.appendChild(og); });
+    s.addEventListener('change', () => { const o = s.selectedOptions[0]; if (!o || !o.value) return; $('inA').value = o.value; store.set('awayName', o.value); store.set('colorA', o.dataset.c); render(); }); })();
   function ink(hex){ const n = parseInt(hex.slice(1), 16), r = n >> 16 & 255, g = n >> 8 & 255, b = n & 255; return (0.299*r + 0.587*g + 0.114*b) > 165 ? '#111214' : '#ffffff'; }
   function buildSw(k, cur){
     const box = $('sw' + k); box.innerHTML = '';
@@ -143,7 +153,7 @@
     i.addEventListener('change', () => { store.set('color' + k, i.value); render(); }); l.appendChild(i); box.appendChild(l);
   }
   function applyColors(){
-    const h = store.get('colorH', '#0a84ff'), a = store.get('colorA', '#ff9f0a'), st = document.documentElement.style;
+    const h = store.get('colorH', '#0067c0'), a = store.get('colorA', '#ff9f0a'), st = document.documentElement.style;
     st.setProperty('--home', h); st.setProperty('--away', a); st.setProperty('--homeInk', ink(h)); st.setProperty('--awayInk', ink(a));
     buildSw('H', h); buildSw('A', a);
   }
