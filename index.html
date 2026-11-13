@@ -11,103 +11,162 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAADp0lEQVR4Xu3czWoUURSF0VYEwZkhvqg+h76o4FBw5qAhSGyldtX9ObdqrTeI2Xx10pX45uPT8w0eeeufhX8xDoyDnHKgHOSUA+UgpxwoBznlQDnIKQfKQU45UA5yyoFykFMOlIOccqAc5JQD5SCnHCgHOeVAOcgpB8pBTjlQDnLKgXKQUw6Ug5xyoBzklAPlIKccKAc55UA5yCkHykFOOVAOcsqBcpBTDpSDnHKgHOSUg8XL8evz9zN9D398/bnEl7NAOU62jLsl9lF9HKdcxir7eFe2byeexYt7P56+fKj5XShajiss49VECqo4jksto/Ijptw4LriMsvsodHNcdhZlT5Aq5bCMgidIiXFYxitFPgWZPw7LeKjCPmbeHGbxf9M/BZlWDsvYaGJC5ozDMiKz9jFhHJaxw5R9jB6HZew2fh/jDlKzOG7wiTqoHJbR0LCEjBiHZTQ3Zh/dx2EZnQzYR8ebwyx6632C9CqHZQzTLyFvPj49N/8yllvG+2+far762q7H7xq2L8dyyziHHv1oPA7LmKj5PpodpGZRQdsTtU05LKOUVglpMA7LKKjJPo6OwzLKOr6P/TeHWdR38ATZWQ7LWMjuhOwZh2UsZ98+4nFYxqJ27CO4OcxidekJsrUclnEa2xOyaRyWcTIb97FpHH+/tGRpG1/hbr057vuQkNVtnMXdpnK8kJClRcuIx3G72ceq0mXsGYd9rGjHMm63zTfHK06QVeybxZ6b4+FEKOvIMnY+Vv7kRC3r4DIajMMJUtPxZey/OZwgZTWZRYObwwlSTcNltHmsOEGKaLuM222dv3g70+W78b1XpPkymt0cTpCJesyi/c3hBBmv3zLa3xz2MVLXZfR6rPx9onrX31bvWXR/rPgpppMxy+j+WLGP5oYtY+g4fNB+3MhljLg5Hp6oTpDU4FkMvTn8FHPElGWMfqw4QXaYtYyZ43CCbDFxGRNuDifIRnNnMfPmcIL8X4VlTH6sOEEeKrKMQuNwgtzVWcb8m8MJ8qLULArdHE6Qgsuo9Vi57AlScxl1x3GdE6TsMsrdHJc6QSrPou7NcYUTpP4yev32OeeQ/ectXIpx8E/GgXGQUw6Ug5xyoBzklAPlIKccKAc55UA5yCkHykFOOVAOcsqBcpBTDpSDnHKgHOSUA+UgpxwoBznlQDnIKQfKQU45UA5yyoFykFMOlIOccqAc5JQD5SCnHCgHOeVAOcgpB8pBTjlQDnLKgXKQUw6Ug9xvK8P3b7N44H4AAAAASUVORK5CYII=">
 <style>
-  :root { --bg:#111214; --fg:#f5f5f7; --dim:#3a3b3f; --left:#0a84ff; --right:#ff9f0a; }
+  :root { --bg:#111214; --fg:#f5f5f7; --dim:#3a3b3f; --home:#0a84ff; --away:#ff9f0a; }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; -webkit-user-select:none; user-select:none; }
   html, body { margin:0; height:100%; background:var(--bg); color:var(--fg); overflow:hidden;
     font-family:-apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif; touch-action:manipulation; }
   #stage { position:fixed; inset:0; display:flex;
     padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
   .half { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3vh; cursor:pointer; transition:background .2s; }
-  .half.on.l { background:rgba(10,132,255,.14); }
-  .half.on.r { background:rgba(255,159,10,.14); }
-  .arrow { width:min(40vw,62vh); height:auto; transition:opacity .2s, transform .2s; opacity:.12; }
+  .half.on.home { background:rgba(10,132,255,.14); }
+  .half.on.away { background:rgba(255,159,10,.14); }
+  .team { display:flex; align-items:center; gap:2vw; opacity:.35; transition:opacity .2s; }
+  .half.on .team { opacity:1; }
+  .logo { height:clamp(48px,12vh,140px); width:auto; max-width:18vw; object-fit:contain; display:none; }
+  .logo.has { display:block; }
+  .arrow { width:min(40vw,56vh); height:auto; transition:opacity .2s, transform .2s; opacity:.12; }
   .arrow path { fill:var(--dim); transition:fill .2s; }
   .half.on .arrow { opacity:1; transform:scale(1.04); }
-  .half.on.l .arrow path { fill:var(--left); }
-  .half.on.r .arrow path { fill:var(--right); }
-  .name { font-size:clamp(28px,6vh,64px); font-weight:700; letter-spacing:.04em; opacity:.35; transition:opacity .2s; }
-  .half.on .name { opacity:1; }
+  .half.on.home .arrow path { fill:var(--home); }
+  .half.on.away .arrow path { fill:var(--away); }
+  .name { font-size:clamp(28px,6vh,64px); font-weight:700; letter-spacing:.04em; }
   .divider { width:1px; background:#2a2b2f; margin:8vh 0; }
   #gear { position:fixed; right:calc(16px + env(safe-area-inset-right)); bottom:calc(16px + env(safe-area-inset-bottom));
     width:44px; height:44px; border-radius:22px; border:1px solid #2f3034; background:#1c1d20; color:#8e8e93;
     font-size:20px; display:flex; align-items:center; justify-content:center; z-index:5; }
   #sheet { position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; z-index:10; }
   #sheet.open { display:flex; }
-  .card { background:#1c1d20; border:1px solid #2f3034; border-radius:14px; padding:24px; width:min(420px,88vw); }
-  .card h2 { margin:0 0 16px; font-size:17px; font-weight:600; }
-  .card label { display:block; font-size:13px; color:#8e8e93; margin:12px 0 6px; }
-  .card input { width:100%; font-size:17px; padding:10px 12px; border-radius:8px; border:1px solid #3a3b3f; background:#111214; color:#f5f5f7; -webkit-user-select:text; user-select:text; }
-  .swap { width:100%; margin-top:20px; font-size:17px; font-weight:600; padding:14px; border-radius:10px; border:1px solid #ff9f0a; background:rgba(255,159,10,.12); color:#ffb340; }
-  .row { display:flex; gap:10px; margin-top:20px; }
-  .row button { flex:1; font-size:16px; padding:12px; border-radius:10px; border:1px solid #3a3b3f; background:#2a2b2f; color:#f5f5f7; }
-  .row button.primary { background:#0a84ff; border-color:#0a84ff; }
+  .card { background:#1c1d20; border:1px solid #2f3034; border-radius:14px; padding:22px 24px; width:min(460px,90vw); max-height:92vh; overflow:auto; }
+  .card h2 { margin:0 0 4px; font-size:17px; font-weight:600; }
+  .sec { margin-top:16px; padding-top:14px; border-top:1px solid #2a2b2f; }
+  .sec:first-of-type { border-top:none; padding-top:4px; }
+  .lbl { font-size:13px; color:#8e8e93; margin:0 0 8px; }
+  .fixed { font-size:17px; font-weight:600; }
+  .card input[type=text] { width:100%; font-size:17px; padding:10px 12px; border-radius:8px; border:1px solid #3a3b3f; background:#111214; color:#f5f5f7; -webkit-user-select:text; user-select:text; }
+  .logorow { display:flex; align-items:center; gap:10px; margin-top:10px; }
+  .thumb { width:52px; height:52px; border-radius:8px; border:1px solid #3a3b3f; background:#111214; object-fit:contain; }
+  .btn { font-size:15px; padding:10px 14px; border-radius:10px; border:1px solid #3a3b3f; background:#2a2b2f; color:#f5f5f7; }
+  .file { position:relative; overflow:hidden; }
+  .file input { position:absolute; inset:0; opacity:0; }
+  .swap { width:100%; margin-top:18px; font-size:17px; font-weight:600; padding:14px; border-radius:10px; border:1px solid #ff9f0a; background:rgba(255,159,10,.12); color:#ffb340; }
+  .row { display:flex; gap:10px; margin-top:14px; }
+  .row .btn { flex:1; font-size:16px; padding:12px; }
+  .btn.primary { background:#0a84ff; border-color:#0a84ff; }
 </style>
 </head>
 <body>
 <div id="stage">
-  <div class="half l" id="L">
+  <div class="half" id="L">
     <svg class="arrow" viewBox="0 0 200 140"><path d="M0 70 L80 0 V40 H200 V100 H80 V140 Z"/></svg>
-    <div class="name" id="nameL">ホーム</div>
+    <div class="team"><img class="logo" id="logoL" alt=""><div class="name" id="nameL"></div></div>
   </div>
   <div class="divider"></div>
-  <div class="half r" id="R">
+  <div class="half" id="R">
     <svg class="arrow" viewBox="0 0 200 140"><path d="M200 70 L120 0 V40 H0 V100 H120 V140 Z"/></svg>
-    <div class="name" id="nameR">アウェイ</div>
+    <div class="team"><img class="logo" id="logoR" alt=""><div class="name" id="nameR"></div></div>
   </div>
 </div>
 <button id="gear" aria-label="設定">⚙︎</button>
 <div id="sheet">
   <div class="card">
     <h2>設定</h2>
-    <label for="inL">左側</label><input id="inL" maxlength="12">
-    <label for="inR">右側</label><input id="inR" maxlength="12">
+    <div class="sec">
+      <div class="lbl">ホーム</div>
+      <div class="fixed">スサノオマジック</div>
+      <div class="logorow">
+        <img class="thumb" id="thumbH" alt="">
+        <label class="btn file">ロゴを選ぶ<input type="file" accept="image/*" id="fileH"></label>
+        <button class="btn" id="delH">削除</button>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="lbl">アウェイ（相手チーム）</div>
+      <input type="text" id="inA" maxlength="14" placeholder="チーム名">
+      <div class="logorow">
+        <img class="thumb" id="thumbA" alt="">
+        <label class="btn file">ロゴを選ぶ<input type="file" accept="image/*" id="fileA"></label>
+        <button class="btn" id="delA">削除</button>
+      </div>
+    </div>
     <button id="swap" class="swap">⇄ コートチェンジ（後半）</button>
     <div class="row">
-      <button id="clear">矢印を消す</button>
-      <button id="ok" class="primary">OK</button>
+      <button class="btn" id="clear">矢印を消す</button>
+      <button class="btn primary" id="ok">OK</button>
     </div>
   </div>
 </div>
 <script>
   const $ = id => document.getElementById(id);
+  const HOME = 'スサノオマジック';
+  const BLANK = 'data:image/gif;base64,R0lGODlhAQABAAAAACw=';
   const store = {
-    get(k, d){ try { return localStorage.getItem(k) ?? d; } catch(e){ return d; } },
-    set(k, v){ try { localStorage.setItem(k, v); } catch(e){} }
+    get(k, d){ try { const v = localStorage.getItem(k); return v === null ? d : v; } catch(e){ return d; } },
+    set(k, v){ try { localStorage.setItem(k, v); return true; } catch(e){ return false; } },
+    del(k){ try { localStorage.removeItem(k); } catch(e){} }
   };
-  let side = store.get('side', '');
+  // 旧版のデータを引き継ぐ
+  if (store.get('homeSide', null) === null) {
+    const oldR = store.get('nameR', null), oldSide = store.get('side', '');
+    store.set('homeSide', 'L');
+    if (oldR && oldR !== 'アウェイ') store.set('awayName', oldR);
+    store.set('poss', oldSide === 'L' ? 'H' : oldSide === 'R' ? 'A' : '');
+  }
+  const S = {
+    get homeSide(){ return store.get('homeSide', 'L'); },
+    get poss(){ return store.get('poss', ''); },
+    get awayName(){ return store.get('awayName', 'アウェイ'); }
+  };
+  function teamOn(side){ return side === S.homeSide ? 'H' : 'A'; }
   function render(){
-    $('L').classList.toggle('on', side === 'L');
-    $('R').classList.toggle('on', side === 'R');
-    $('nameL').textContent = store.get('nameL', 'ホーム');
-    $('nameR').textContent = store.get('nameR', 'アウェイ');
+    for (const side of ['L', 'R']) {
+      const t = teamOn(side), el = $(side);
+      el.classList.toggle('home', t === 'H');
+      el.classList.toggle('away', t === 'A');
+      el.classList.toggle('on', S.poss === t);
+      $('name' + side).textContent = t === 'H' ? HOME : S.awayName;
+      const src = store.get(t === 'H' ? 'logoH' : 'logoA', '');
+      const img = $('logo' + side);
+      img.src = src || BLANK; img.classList.toggle('has', !!src);
+    }
+    $('thumbH').src = store.get('logoH', '') || BLANK;
+    $('thumbA').src = store.get('logoA', '') || BLANK;
   }
   let lock = null;
   async function keepAwake(){
     try { if ('wakeLock' in navigator && !lock) { lock = await navigator.wakeLock.request('screen'); lock.addEventListener('release', () => lock = null); } } catch(e){}
   }
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') keepAwake(); });
-  function pick(s){ side = s; store.set('side', s); render(); keepAwake(); }
-  $('L').addEventListener('click', () => pick('L'));
-  $('R').addEventListener('click', () => pick('R'));
-  $('gear').addEventListener('click', () => {
-    $('inL').value = store.get('nameL', 'ホーム');
-    $('inR').value = store.get('nameR', 'アウェイ');
-    $('sheet').classList.add('open');
-  });
-  $('ok').addEventListener('click', () => {
-    store.set('nameL', $('inL').value.trim() || 'ホーム');
-    store.set('nameR', $('inR').value.trim() || 'アウェイ');
-    $('sheet').classList.remove('open'); render();
-  });
-  $('swap').addEventListener('click', () => {
-    const l = $('inL').value.trim() || store.get('nameL', 'ホーム');
-    const r = $('inR').value.trim() || store.get('nameR', 'アウェイ');
-    store.set('nameL', r); store.set('nameR', l);
-    pick(side === 'L' ? 'R' : side === 'R' ? 'L' : '');
-    $('sheet').classList.remove('open');
-  });
-  $('clear').addEventListener('click', () => { pick(''); $('sheet').classList.remove('open'); });
-  $('sheet').addEventListener('click', e => { if (e.target.id === 'sheet') $('sheet').classList.remove('open'); });
+  function setPoss(p){ store.set('poss', p); render(); keepAwake(); }
+  $('L').addEventListener('click', () => setPoss(teamOn('L')));
+  $('R').addEventListener('click', () => setPoss(teamOn('R')));
+
+  function loadLogo(file, key){
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const max = 360, k = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      if (!store.set(key, c.toDataURL('image/png'))) store.set(key, c.toDataURL('image/jpeg', 0.85));
+      render();
+    };
+    img.src = url;
+  }
+  $('fileH').addEventListener('change', e => { loadLogo(e.target.files[0], 'logoH'); e.target.value = ''; });
+  $('fileA').addEventListener('change', e => { loadLogo(e.target.files[0], 'logoA'); e.target.value = ''; });
+  $('delH').addEventListener('click', () => { store.del('logoH'); render(); });
+  $('delA').addEventListener('click', () => { store.del('logoA'); render(); });
+
+  function saveName(){ store.set('awayName', $('inA').value.trim() || 'アウェイ'); }
+  function close(){ saveName(); $('sheet').classList.remove('open'); render(); }
+  $('gear').addEventListener('click', () => { $('inA').value = S.awayName === 'アウェイ' ? '' : S.awayName; render(); $('sheet').classList.add('open'); });
+  $('ok').addEventListener('click', close);
+  $('swap').addEventListener('click', () => { store.set('homeSide', S.homeSide === 'L' ? 'R' : 'L'); close(); });
+  $('clear').addEventListener('click', () => { store.set('poss', ''); close(); });
+  $('sheet').addEventListener('click', e => { if (e.target.id === 'sheet') close(); });
   document.addEventListener('gesturestart', e => e.preventDefault());
   render();
   if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').catch(() => {}); }
