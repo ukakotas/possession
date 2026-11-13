@@ -17,20 +17,28 @@
     font-family:-apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif; touch-action:manipulation; }
   #stage { position:fixed; inset:0; display:flex;
     padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
-  .half { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3vh; cursor:pointer; transition:background .2s; }
-  .half.on.home { background:rgba(10,132,255,.14); }
-  .half.on.away { background:rgba(255,159,10,.14); }
-  .team { display:flex; align-items:center; gap:2vw; opacity:.35; transition:opacity .2s; }
-  .half.on .team { opacity:1; }
-  .logo { height:clamp(48px,12vh,140px); width:auto; max-width:18vw; object-fit:contain; display:none; }
+  .half { flex:1; display:flex; align-items:center; justify-content:center; cursor:pointer;
+    background:#16171a; transition:background .25s; }
+  .half.on.home { background:var(--home); }
+  .half.on.away { background:var(--away); }
+  .team { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3vh;
+    opacity:.28; transition:opacity .25s, transform .25s; padding:0 3vw; text-align:center; }
+  .half.on .team { opacity:1; transform:scale(1.03); }
+  .logo { height:clamp(80px,30vh,320px); width:auto; max-width:34vw; object-fit:contain; display:none; }
   .logo.has { display:block; }
-  .arrow { width:min(40vw,56vh); height:auto; transition:opacity .2s, transform .2s; opacity:.12; }
-  .arrow path { fill:var(--dim); transition:fill .2s; }
-  .half.on .arrow { opacity:1; transform:scale(1.04); }
-  .half.on.home .arrow path { fill:var(--home); }
-  .half.on.away .arrow path { fill:var(--away); }
-  .name { font-size:clamp(28px,6vh,64px); font-weight:700; letter-spacing:.04em; }
-  .divider { width:1px; background:#2a2b2f; margin:8vh 0; }
+  .name { font-size:clamp(30px,7.5vh,84px); font-weight:800; letter-spacing:.03em; line-height:1.15; word-break:keep-all; }
+  .badge { font-size:clamp(16px,3.4vh,34px); font-weight:800; letter-spacing:.3em; padding:.35em 1.1em .35em 1.4em;
+    border-radius:999px; background:#fff; color:#111214; visibility:hidden; }
+  .half.on .badge { visibility:visible; }
+  .half.on.home .badge { color:var(--home); }
+  .half.on.away .badge { color:var(--away); }
+  #mid { position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); width:clamp(70px,12vw,150px); height:clamp(70px,12vw,150px);
+    border-radius:50%; background:#111214; border:4px solid #fff; display:flex; align-items:center; justify-content:center;
+    pointer-events:none; z-index:3; transition:opacity .2s; opacity:0; }
+  #mid.show { opacity:1; }
+  #mid svg { width:58%; height:58%; transition:transform .25s; }
+  #mid.left svg { transform:rotate(180deg); }
+  #mid path { fill:#fff; }
   #gear { position:fixed; right:calc(16px + env(safe-area-inset-right)); bottom:calc(16px + env(safe-area-inset-bottom));
     width:44px; height:44px; border-radius:22px; border:1px solid #2f3034; background:#1c1d20; color:#8e8e93;
     font-size:20px; display:flex; align-items:center; justify-content:center; z-index:5; }
@@ -57,15 +65,13 @@
 <body>
 <div id="stage">
   <div class="half" id="L">
-    <svg class="arrow" viewBox="0 0 200 140"><path d="M0 70 L80 0 V40 H200 V100 H80 V140 Z"/></svg>
-    <div class="team"><img class="logo" id="logoL" alt=""><div class="name" id="nameL"></div></div>
+    <div class="team"><img class="logo" id="logoL" alt=""><div class="name" id="nameL"></div><div class="badge">BALL</div></div>
   </div>
-  <div class="divider"></div>
   <div class="half" id="R">
-    <svg class="arrow" viewBox="0 0 200 140"><path d="M200 70 L120 0 V40 H0 V100 H120 V140 Z"/></svg>
-    <div class="team"><img class="logo" id="logoR" alt=""><div class="name" id="nameR"></div></div>
+    <div class="team"><img class="logo" id="logoR" alt=""><div class="name" id="nameR"></div><div class="badge">BALL</div></div>
   </div>
 </div>
+<div id="mid"><svg viewBox="0 0 100 100"><path d="M18 38 H56 V18 L90 50 L56 82 V62 H18 Z"/></svg></div>
 <button id="gear" aria-label="設定">⚙︎</button>
 <div id="sheet">
   <div class="card">
@@ -90,7 +96,7 @@
     </div>
     <button id="swap" class="swap">⇄ コートチェンジ（後半）</button>
     <div class="row">
-      <button class="btn" id="clear">矢印を消す</button>
+      <button class="btn" id="clear">表示を消す</button>
       <button class="btn primary" id="ok">OK</button>
     </div>
   </div>
@@ -128,6 +134,9 @@
       const img = $('logo' + side);
       img.src = src || BLANK; img.classList.toggle('has', !!src);
     }
+    const onSide = S.poss === '' ? '' : (teamOn('L') === S.poss ? 'L' : 'R');
+    $('mid').classList.toggle('show', !!onSide);
+    $('mid').classList.toggle('left', onSide === 'L');
     $('thumbH').src = store.get('logoH', '') || BLANK;
     $('thumbA').src = store.get('logoA', '') || BLANK;
   }
