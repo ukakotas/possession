@@ -28,7 +28,7 @@
   .half.on.away .team { color:var(--awayInk); }
   .logo { position:absolute; bottom:calc(100% + 4vh); left:50%; transform:translateX(-50%); height:clamp(80px,26vh,300px); width:auto; max-width:34vw; object-fit:contain; display:none; }
   .logo.has { display:block; }
-  .name { font-size:clamp(30px,7.5vh,84px); font-weight:800; letter-spacing:.03em; line-height:1.15; word-break:keep-all; }
+  .name { font-size:clamp(30px,7.5vh,84px); font-weight:800; letter-spacing:.03em; line-height:1.15; white-space:nowrap; }
   .badge { font-size:clamp(16px,3.4vh,34px); font-weight:800; letter-spacing:.3em; padding:.35em 1.1em .35em 1.4em;
     border-radius:999px; background:#fff; color:#111214; visibility:hidden;
     position:absolute; top:calc(100% + 3vh); left:50%; transform:translateX(-50%); white-space:nowrap; }
@@ -157,6 +157,13 @@
     st.setProperty('--home', h); st.setProperty('--away', a); st.setProperty('--homeInk', ink(h)); st.setProperty('--awayInk', ink(a));
     buildSw('H', h); buildSw('A', a);
   }
+  function fitNames(){
+    const max = window.innerWidth * 0.34;
+    for (const side of ['L', 'R']) { const el = $('name' + side); el.style.fontSize = '';
+      let fs = parseFloat(getComputedStyle(el).fontSize);
+      while (el.scrollWidth > max && fs > 16) { fs -= 2; el.style.fontSize = fs + 'px'; } }
+  }
+  window.addEventListener('resize', () => fitNames());
   function teamOn(side){ return side === S.homeSide ? 'H' : 'A'; }
   function render(){
     applyColors();
@@ -173,6 +180,7 @@
     const onSide = S.poss === '' ? '' : (teamOn('L') === S.poss ? 'L' : 'R');
     $('mid').classList.toggle('show', !!onSide);
     $('mid').classList.toggle('left', onSide === 'L');
+    fitNames();
     $('thumbH').src = store.get('logoH', '') || BLANK;
     $('thumbA').src = store.get('logoA', '') || BLANK;
   }
