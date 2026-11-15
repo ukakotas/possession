@@ -1,4 +1,4 @@
-const CACHE = 'possession-v10';
+const CACHE = 'possession-v11';
 const FILES = ['./', './index.html', './manifest.json'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES.map(u => new Request(u, {cache: 'reload'})))).then(() => self.skipWaiting()));
@@ -8,6 +8,7 @@ self.addEventListener('activate', e => {
 });
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+  if (new URL(e.request.url).searchParams.has('check')) { e.respondWith(fetch(e.request.url, {cache: 'no-store'})); return; }
   e.respondWith(caches.open(CACHE).then(c => c.match(e.request, {ignoreSearch: true}).then(hit => {
     const net = fetch(e.request.url, {cache: 'no-cache'}).then(res => { if (res.ok) c.put(e.request, res.clone()); return res; }).catch(() => hit);
     return hit || net;
