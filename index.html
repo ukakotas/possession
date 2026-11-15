@@ -108,7 +108,7 @@
 </div>
 <div id="mid"><span class="ftx">FT</span><svg viewBox="0 0 100 100"><path d="M18 38 H56 V18 L90 50 L56 82 V62 H18 Z"/></svg></div>
 <button id="ft">フリースロー</button>
-<div id="elapsed"><small>攻守切替から</small><span id="elT">0秒</span></div>
+<div id="elapsed"><small>最後に押してから</small><span id="elT">0秒</span></div>
 <button id="gear" aria-label="設定">⚙︎</button>
 <div id="sheet">
   <div class="card">
@@ -145,7 +145,7 @@
 </div>
 <script>
   const $ = id => document.getElementById(id);
-  const APP_VERSION = '14';
+  const APP_VERSION = '15';
   const HOME = 'スサノオマジック';
   const BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
   const store = {
@@ -239,7 +239,7 @@
     $('elapsed').classList.add('show');
   }
   setInterval(tick, 1000);
-  function setPoss(p){ if (p && p !== S.poss) markTap(); if (p !== S.poss) store.set('ft', '0'); store.set('poss', p); render(); keepAwake(); }
+  function setPoss(p){ if (p) markTap(); if (p !== S.poss) store.set('ft', '0'); store.set('poss', p); render(); keepAwake(); }
   $('L').addEventListener('click', () => setPoss(teamOn('L')));
   $('R').addEventListener('click', () => setPoss(teamOn('R')));
 
@@ -268,7 +268,7 @@
   $('gear').addEventListener('click', () => { msg(''); $('inA').value = S.awayName === 'アウェイ' ? '' : S.awayName; render(); $('sheet').classList.add('open'); });
   $('ok').addEventListener('click', close);
   $('swap').addEventListener('click', () => { store.set('homeSide', S.homeSide === 'L' ? 'R' : 'L'); close(); });
-  $('ft').addEventListener('click', () => { store.set('ft', store.get('ft', '0') === '1' ? '0' : '1'); render(); keepAwake(); });
+  $('ft').addEventListener('click', () => { markTap(); store.set('ft', store.get('ft', '0') === '1' ? '0' : '1'); render(); keepAwake(); });
   $('clear').addEventListener('click', () => { store.set('ft', '0'); store.set('poss', ''); close(); });
   $('sheet').addEventListener('click', e => { if (e.target.id === 'sheet') close(); });
   $('ver').textContent = 'Ver.' + APP_VERSION;
