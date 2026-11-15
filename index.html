@@ -56,9 +56,9 @@
   #mid.ftmode { background:#ffd60a; }
   #mid.ftmode .ftx { color:#111214; }
   #ft.on { background:#ffd60a; border-color:#ffd60a; color:#111214; }
-  #verTag { position:fixed; left:calc(14px + env(safe-area-inset-left)); bottom:calc(14px + env(safe-area-inset-bottom)); font-size:11px; color:#5a5b60; z-index:5; pointer-events:none; }
+  #verTag { position:fixed; left:calc(14px + env(safe-area-inset-left)); bottom:calc(14px + env(safe-area-inset-bottom)); font-size:clamp(16px,2.4vh,22px); font-weight:700; color:#a1a1a6; letter-spacing:.02em; z-index:5; pointer-events:none; }
   .verrow { display:flex; align-items:center; gap:10px; margin-top:16px; padding-top:14px; border-top:1px solid #2a2b2f; font-size:13px; color:#8e8e93; }
-  .verrow b { color:#f5f5f7; font-weight:600; }
+  .verrow b { color:#f5f5f7; font-weight:700; font-size:18px; }
   .verrow .btn { margin-left:auto; }
   #chkmsg { font-size:13px; color:#ffd60a; margin-top:8px; min-height:1em; }
   #gear { position:fixed; right:calc(16px + env(safe-area-inset-right)); bottom:calc(16px + env(safe-area-inset-bottom));
@@ -140,7 +140,7 @@
 </div>
 <script>
   const $ = id => document.getElementById(id);
-  const APP_VERSION = '2026-11-15 13:30';
+  const APP_VERSION = '2026-11-15 13:40';
   const HOME = 'スサノオマジック';
   const BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
   const store = {
