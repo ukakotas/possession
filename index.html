@@ -56,9 +56,9 @@
   #mid.ftmode { background:#ffd60a; }
   #mid.ftmode .ftx { color:#111214; }
   #ft.on { background:#ffd60a; border-color:#ffd60a; color:#111214; }
-  #verTag { position:fixed; left:calc(14px + env(safe-area-inset-left)); bottom:calc(14px + env(safe-area-inset-bottom)); font-size:clamp(16px,2.4vh,22px); font-weight:700; color:#a1a1a6; letter-spacing:.02em; z-index:5; pointer-events:none; }
+  #verTag { position:fixed; left:calc(14px + env(safe-area-inset-left)); bottom:calc(14px + env(safe-area-inset-bottom)); font-size:clamp(20px,3.4vh,30px); font-weight:800; color:#111214; background:#ffd60a; padding:.3em .8em; border-radius:12px; letter-spacing:.02em; z-index:5; pointer-events:none; box-shadow:0 2px 10px rgba(0,0,0,.4); }
   .verrow { display:flex; align-items:center; gap:10px; margin-top:16px; padding-top:14px; border-top:1px solid #2a2b2f; font-size:13px; color:#8e8e93; }
-  .verrow b { color:#f5f5f7; font-weight:700; font-size:18px; }
+  .verrow b { color:#111214; background:#ffd60a; font-weight:800; font-size:20px; padding:.2em .6em; border-radius:8px; }
   .verrow .btn { margin-left:auto; }
   #chkmsg { font-size:13px; color:#ffd60a; margin-top:8px; min-height:1em; }
   #gear { position:fixed; right:calc(16px + env(safe-area-inset-right)); bottom:calc(16px + env(safe-area-inset-bottom));
@@ -140,7 +140,7 @@
 </div>
 <script>
   const $ = id => document.getElementById(id);
-  const APP_VERSION = '2026-11-15 13:40';
+  const APP_VERSION = '2026-11-15 13:50';
   const HOME = 'スサノオマジック';
   const BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
   const store = {
@@ -256,7 +256,7 @@
   $('ft').addEventListener('click', () => { store.set('ft', store.get('ft', '0') === '1' ? '0' : '1'); render(); keepAwake(); });
   $('clear').addEventListener('click', () => { store.set('ft', '0'); store.set('poss', ''); close(); });
   $('sheet').addEventListener('click', e => { if (e.target.id === 'sheet') close(); });
-  $('ver').textContent = APP_VERSION; $('verTag').textContent = 'ver ' + APP_VERSION;
+  $('ver').textContent = APP_VERSION; $('verTag').textContent = '更新 ' + APP_VERSION.slice(5).replace('-', '/');
   const msg = s => { $('chkmsg').textContent = s; };
   $('chk').addEventListener('click', async () => {
     if (!navigator.onLine) { msg('ネットにつながっていないため確認できません'); return; }
@@ -269,7 +269,8 @@
       if (!m) { msg('確認できませんでした'); return; }
       if (m[1] === APP_VERSION) { msg('最新版です（' + m[1] + '）'); return; }
       msg('新しい版があります（' + m[1] + '）。更新します…');
-      for (const k of await caches.keys()) await caches.delete(k);
+      const fresh = () => new Response(txt, { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+      for (const k of await caches.keys()) { const c = await caches.open(k); await c.put('./', fresh()); await c.put('./index.html', fresh()); }
       setTimeout(() => location.reload(), 800);
     } catch (e) { msg('確認できませんでした。電波のよい所でもう一度お試しください'); }
   });
