@@ -42,6 +42,13 @@
   #mid svg { width:58%; height:58%; transition:transform .25s; }
   #mid.left svg { transform:rotate(180deg); }
   #mid path { fill:#fff; }
+  #ft { position:fixed; left:50%; bottom:calc(16px + env(safe-area-inset-bottom)); transform:translateX(-50%); padding:10px 22px; border-radius:22px;
+    border:1px solid #2f3034; background:#1c1d20; color:#8e8e93; font-size:16px; font-weight:700; z-index:5; }
+  #ft.on { background:#fff; color:#111214; border-color:#fff; }
+  #mid .ftx { display:none; font-weight:900; font-size:clamp(24px,4.2vw,52px); color:#fff; letter-spacing:.02em; }
+  #mid.ftmode svg { display:none; }
+  #mid.ftmode .ftx { display:block; }
+  .badge.ftb { letter-spacing:.08em; padding:.35em 1.1em; }
   #gear { position:fixed; right:calc(16px + env(safe-area-inset-right)); bottom:calc(16px + env(safe-area-inset-bottom));
     width:44px; height:44px; border-radius:22px; border:1px solid #2f3034; background:#1c1d20; color:#8e8e93;
     font-size:20px; display:flex; align-items:center; justify-content:center; z-index:5; }
@@ -82,7 +89,8 @@
     <div class="team"><img class="logo" id="logoR" alt=""><div class="name" id="nameR"></div><div class="badge">BALL</div></div>
   </div>
 </div>
-<div id="mid"><svg viewBox="0 0 100 100"><path d="M18 38 H56 V18 L90 50 L56 82 V62 H18 Z"/></svg></div>
+<div id="mid"><span class="ftx">FT</span><svg viewBox="0 0 100 100"><path d="M18 38 H56 V18 L90 50 L56 82 V62 H18 Z"/></svg></div>
+<button id="ft">フリースロー</button>
 <button id="gear" aria-label="設定">⚙︎</button>
 <div id="sheet">
   <div class="card">
@@ -186,6 +194,10 @@
     const onSide = S.poss === '' ? '' : (teamOn('L') === S.poss ? 'L' : 'R');
     $('mid').classList.toggle('show', !!onSide);
     $('mid').classList.toggle('left', onSide === 'L');
+    const ft = store.get('ft', '0') === '1';
+    document.querySelectorAll('.badge').forEach(b => { b.textContent = ft ? 'フリースロー' : 'BALL'; b.classList.toggle('ftb', ft); });
+    $('ft').classList.toggle('on', ft);
+    $('mid').classList.toggle('ftmode', ft);
     fitNames();
     $('thumbH').src = store.get('logoH', '') || BLANK;
     $('thumbA').src = store.get('logoA', '') || BLANK;
@@ -195,7 +207,7 @@
     try { if ('wakeLock' in navigator && !lock) { lock = await navigator.wakeLock.request('screen'); lock.addEventListener('release', () => lock = null); } } catch(e){}
   }
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') keepAwake(); });
-  function setPoss(p){ store.set('poss', p); render(); keepAwake(); }
+  function setPoss(p){ if (p !== S.poss) store.set('ft', '0'); store.set('poss', p); render(); keepAwake(); }
   $('L').addEventListener('click', () => setPoss(teamOn('L')));
   $('R').addEventListener('click', () => setPoss(teamOn('R')));
 
@@ -224,7 +236,8 @@
   $('gear').addEventListener('click', () => { $('inA').value = S.awayName === 'アウェイ' ? '' : S.awayName; render(); $('sheet').classList.add('open'); });
   $('ok').addEventListener('click', close);
   $('swap').addEventListener('click', () => { store.set('homeSide', S.homeSide === 'L' ? 'R' : 'L'); close(); });
-  $('clear').addEventListener('click', () => { store.set('poss', ''); close(); });
+  $('ft').addEventListener('click', () => { store.set('ft', store.get('ft', '0') === '1' ? '0' : '1'); render(); keepAwake(); });
+  $('clear').addEventListener('click', () => { store.set('ft', '0'); store.set('poss', ''); close(); });
   $('sheet').addEventListener('click', e => { if (e.target.id === 'sheet') close(); });
   document.addEventListener('gesturestart', e => e.preventDefault());
   render();
