@@ -108,7 +108,7 @@
 </div>
 <div id="mid"><span class="ftx">FT</span><svg viewBox="0 0 100 100"><path d="M18 38 H56 V18 L90 50 L56 82 V62 H18 Z"/></svg></div>
 <button id="ft">フリースロー</button>
-<div id="elapsed"><small>最後のタップから</small><span id="elT">0:00</span></div>
+<div id="elapsed"><small>最後のタップから</small><span id="elT">0秒</span></div>
 <div id="verTag"></div>
 <button id="gear" aria-label="設定">⚙︎</button>
 <div id="sheet">
@@ -146,7 +146,7 @@
 </div>
 <script>
   const $ = id => document.getElementById(id);
-  const APP_VERSION = '2026-11-15 14:00';
+  const APP_VERSION = '2026-11-15 14:10';
   const HOME = 'スサノオマジック';
   const BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
   const store = {
@@ -236,8 +236,7 @@
     const t0 = parseInt(store.get('lastTap', '0'), 10);
     if (!t0 || !S.poss) { $('elapsed').classList.remove('show'); return; }
     const s = Math.max(0, Math.floor((Date.now() - t0) / 1000));
-    const m = Math.floor(s / 60);
-    $('elT').textContent = m >= 100 ? '99:59+' : m + ':' + String(s % 60).padStart(2, '0');
+    $('elT').textContent = (s > 9999 ? '9999+' : s) + '秒';
     $('elapsed').classList.add('show');
   }
   setInterval(tick, 1000);
