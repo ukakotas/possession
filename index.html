@@ -56,6 +56,11 @@
   #mid.ftmode { background:#ffd60a; }
   #mid.ftmode .ftx { color:#111214; }
   #ft.on { background:#ffd60a; border-color:#ffd60a; color:#111214; }
+  #elapsed { position:fixed; top:calc(16px + env(safe-area-inset-top)); left:50%; transform:translateX(-50%); z-index:5; pointer-events:none;
+    font-size:clamp(22px,4.2vh,44px); font-weight:800; color:#f5f5f7; background:rgba(17,18,20,.85); border:2px solid #3a3b3f;
+    padding:.2em .8em; border-radius:999px; font-variant-numeric:tabular-nums; letter-spacing:.02em; white-space:nowrap; display:none; }
+  #elapsed.show { display:block; }
+  #elapsed small { font-size:.5em; font-weight:700; color:#a1a1a6; margin-right:.5em; vertical-align:middle; }
   #verTag { position:fixed; left:calc(14px + env(safe-area-inset-left)); bottom:calc(14px + env(safe-area-inset-bottom)); font-size:clamp(20px,3.4vh,30px); font-weight:800; color:#111214; background:#ffd60a; padding:.3em .8em; border-radius:12px; letter-spacing:.02em; z-index:5; pointer-events:none; box-shadow:0 2px 10px rgba(0,0,0,.4); }
   .verrow { display:flex; align-items:center; gap:10px; margin-top:16px; padding-top:14px; border-top:1px solid #2a2b2f; font-size:13px; color:#8e8e93; }
   .verrow b { color:#111214; background:#ffd60a; font-weight:800; font-size:20px; padding:.2em .6em; border-radius:8px; }
@@ -103,6 +108,7 @@
 </div>
 <div id="mid"><span class="ftx">FT</span><svg viewBox="0 0 100 100"><path d="M18 38 H56 V18 L90 50 L56 82 V62 H18 Z"/></svg></div>
 <button id="ft">フリースロー</button>
+<div id="elapsed"><small>最後のタップから</small><span id="elT">0:00</span></div>
 <div id="verTag"></div>
 <button id="gear" aria-label="設定">⚙︎</button>
 <div id="sheet">
@@ -140,7 +146,7 @@
 </div>
 <script>
   const $ = id => document.getElementById(id);
-  const APP_VERSION = '2026-11-15 13:50';
+  const APP_VERSION = '2026-11-15 14:00';
   const HOME = 'スサノオマジック';
   const BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
   const store = {
@@ -216,6 +222,7 @@
     $('ft').classList.toggle('on', ft);
     $('mid').classList.toggle('ftmode', ft);
     fitNames();
+    tick();
     $('thumbH').src = store.get('logoH', '') || BLANK;
     $('thumbA').src = store.get('logoA', '') || BLANK;
   }
@@ -224,7 +231,17 @@
     try { if ('wakeLock' in navigator && !lock) { lock = await navigator.wakeLock.request('screen'); lock.addEventListener('release', () => lock = null); } } catch(e){}
   }
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') keepAwake(); });
-  function setPoss(p){ if (p !== S.poss) store.set('ft', '0'); store.set('poss', p); render(); keepAwake(); }
+  function markTap(){ store.set('lastTap', String(Date.now())); tick(); }
+  function tick(){
+    const t0 = parseInt(store.get('lastTap', '0'), 10);
+    if (!t0 || !S.poss) { $('elapsed').classList.remove('show'); return; }
+    const s = Math.max(0, Math.floor((Date.now() - t0) / 1000));
+    const m = Math.floor(s / 60);
+    $('elT').textContent = m >= 100 ? '99:59+' : m + ':' + String(s % 60).padStart(2, '0');
+    $('elapsed').classList.add('show');
+  }
+  setInterval(tick, 1000);
+  function setPoss(p){ if (p) markTap(); if (p !== S.poss) store.set('ft', '0'); store.set('poss', p); render(); keepAwake(); }
   $('L').addEventListener('click', () => setPoss(teamOn('L')));
   $('R').addEventListener('click', () => setPoss(teamOn('R')));
 
@@ -253,7 +270,7 @@
   $('gear').addEventListener('click', () => { msg(''); $('inA').value = S.awayName === 'アウェイ' ? '' : S.awayName; render(); $('sheet').classList.add('open'); });
   $('ok').addEventListener('click', close);
   $('swap').addEventListener('click', () => { store.set('homeSide', S.homeSide === 'L' ? 'R' : 'L'); close(); });
-  $('ft').addEventListener('click', () => { store.set('ft', store.get('ft', '0') === '1' ? '0' : '1'); render(); keepAwake(); });
+  $('ft').addEventListener('click', () => { markTap(); store.set('ft', store.get('ft', '0') === '1' ? '0' : '1'); render(); keepAwake(); });
   $('clear').addEventListener('click', () => { store.set('ft', '0'); store.set('poss', ''); close(); });
   $('sheet').addEventListener('click', e => { if (e.target.id === 'sheet') close(); });
   $('ver').textContent = APP_VERSION; $('verTag').textContent = '更新 ' + APP_VERSION.slice(5).replace('-', '/');
