@@ -48,7 +48,14 @@
   #mid .ftx { display:none; font-weight:900; font-size:clamp(24px,4.2vw,52px); color:#fff; letter-spacing:.02em; }
   #mid.ftmode svg { display:none; }
   #mid.ftmode .ftx { display:block; }
-  .badge.ftb { letter-spacing:.08em; padding:.35em 1.1em; }
+  .half.on .badge.ftb { font-size:clamp(28px,7vh,72px); letter-spacing:.06em; padding:.3em .9em; background:#ffd60a; color:#111214;
+    box-shadow:0 0 0 6px rgba(0,0,0,.25); animation:ftpulse .8s ease-in-out infinite alternate; }
+  @keyframes ftpulse { from { transform:translateX(-50%) scale(1); } to { transform:translateX(-50%) scale(1.1); } }
+  .half.on.ft { box-shadow:inset 0 0 0 clamp(10px,1.6vw,22px) #ffd60a; animation:ftframe .8s ease-in-out infinite alternate; }
+  @keyframes ftframe { from { box-shadow:inset 0 0 0 clamp(10px,1.6vw,22px) #ffd60a; } to { box-shadow:inset 0 0 0 clamp(10px,1.6vw,22px) rgba(255,214,10,.35); } }
+  #mid.ftmode { background:#ffd60a; }
+  #mid.ftmode .ftx { color:#111214; }
+  #ft.on { background:#ffd60a; border-color:#ffd60a; color:#111214; }
   #gear { position:fixed; right:calc(16px + env(safe-area-inset-right)); bottom:calc(16px + env(safe-area-inset-bottom));
     width:44px; height:44px; border-radius:22px; border:1px solid #2f3034; background:#1c1d20; color:#8e8e93;
     font-size:20px; display:flex; align-items:center; justify-content:center; z-index:5; }
@@ -186,6 +193,7 @@
       el.classList.toggle('home', t === 'H');
       el.classList.toggle('away', t === 'A');
       el.classList.toggle('on', S.poss === t);
+      el.classList.toggle('ft', S.poss === t && store.get('ft', '0') === '1');
       $('name' + side).textContent = t === 'H' ? HOME : S.awayName;
       const src = store.get(t === 'H' ? 'logoH' : 'logoA', '');
       const img = $('logo' + side);
