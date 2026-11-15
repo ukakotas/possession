@@ -56,6 +56,11 @@
   #mid.ftmode { background:#ffd60a; }
   #mid.ftmode .ftx { color:#111214; }
   #ft.on { background:#ffd60a; border-color:#ffd60a; color:#111214; }
+  #verTag { position:fixed; left:calc(14px + env(safe-area-inset-left)); bottom:calc(14px + env(safe-area-inset-bottom)); font-size:11px; color:#5a5b60; z-index:5; pointer-events:none; }
+  .verrow { display:flex; align-items:center; gap:10px; margin-top:16px; padding-top:14px; border-top:1px solid #2a2b2f; font-size:13px; color:#8e8e93; }
+  .verrow b { color:#f5f5f7; font-weight:600; }
+  .verrow .btn { margin-left:auto; }
+  #chkmsg { font-size:13px; color:#ffd60a; margin-top:8px; min-height:1em; }
   #gear { position:fixed; right:calc(16px + env(safe-area-inset-right)); bottom:calc(16px + env(safe-area-inset-bottom));
     width:44px; height:44px; border-radius:22px; border:1px solid #2f3034; background:#1c1d20; color:#8e8e93;
     font-size:20px; display:flex; align-items:center; justify-content:center; z-index:5; }
@@ -98,6 +103,7 @@
 </div>
 <div id="mid"><span class="ftx">FT</span><svg viewBox="0 0 100 100"><path d="M18 38 H56 V18 L90 50 L56 82 V62 H18 Z"/></svg></div>
 <button id="ft">フリースロー</button>
+<div id="verTag"></div>
 <button id="gear" aria-label="設定">⚙︎</button>
 <div id="sheet">
   <div class="card">
@@ -124,6 +130,8 @@
       <div class="sw" id="swA"></div>
     </div>
     <button id="swap" class="swap">⇄ コートチェンジ（後半）</button>
+    <div class="verrow">バージョン <b id="ver"></b><button class="btn" id="chk">更新を確認</button></div>
+    <div id="chkmsg"></div>
     <div class="row">
       <button class="btn" id="clear">表示を消す</button>
       <button class="btn primary" id="ok">OK</button>
@@ -132,6 +140,7 @@
 </div>
 <script>
   const $ = id => document.getElementById(id);
+  const APP_VERSION = '2026-11-15 13:30';
   const HOME = 'スサノオマジック';
   const BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
   const store = {
@@ -241,12 +250,29 @@
 
   function saveName(){ store.set('awayName', $('inA').value.trim() || 'アウェイ'); }
   function close(){ saveName(); $('sheet').classList.remove('open'); render(); }
-  $('gear').addEventListener('click', () => { $('inA').value = S.awayName === 'アウェイ' ? '' : S.awayName; render(); $('sheet').classList.add('open'); });
+  $('gear').addEventListener('click', () => { msg(''); $('inA').value = S.awayName === 'アウェイ' ? '' : S.awayName; render(); $('sheet').classList.add('open'); });
   $('ok').addEventListener('click', close);
   $('swap').addEventListener('click', () => { store.set('homeSide', S.homeSide === 'L' ? 'R' : 'L'); close(); });
   $('ft').addEventListener('click', () => { store.set('ft', store.get('ft', '0') === '1' ? '0' : '1'); render(); keepAwake(); });
   $('clear').addEventListener('click', () => { store.set('ft', '0'); store.set('poss', ''); close(); });
   $('sheet').addEventListener('click', e => { if (e.target.id === 'sheet') close(); });
+  $('ver').textContent = APP_VERSION; $('verTag').textContent = 'ver ' + APP_VERSION;
+  const msg = s => { $('chkmsg').textContent = s; };
+  $('chk').addEventListener('click', async () => {
+    if (!navigator.onLine) { msg('ネットにつながっていないため確認できません'); return; }
+    msg('確認中…');
+    try {
+      const reg = navigator.serviceWorker ? await navigator.serviceWorker.getRegistration() : null;
+      if (reg) { await reg.update().catch(() => {}); if (reg.installing || reg.waiting) await new Promise(r => { navigator.serviceWorker.addEventListener('controllerchange', r, { once: true }); setTimeout(r, 4000); }); }
+      const txt = await (await fetch('index.html?check=' + Date.now(), { cache: 'no-store' })).text();
+      const m = txt.match(/APP_VERSION = '([^']+)'/);
+      if (!m) { msg('確認できませんでした'); return; }
+      if (m[1] === APP_VERSION) { msg('最新版です（' + m[1] + '）'); return; }
+      msg('新しい版があります（' + m[1] + '）。更新します…');
+      for (const k of await caches.keys()) await caches.delete(k);
+      setTimeout(() => location.reload(), 800);
+    } catch (e) { msg('確認できませんでした。電波のよい所でもう一度お試しください'); }
+  });
   document.addEventListener('gesturestart', e => e.preventDefault());
   render();
   if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').catch(() => {}); }
